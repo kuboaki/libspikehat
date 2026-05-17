@@ -38,9 +38,17 @@ C アプリケーションからはリンクして、Python アプリケーシ�
 
 - Raspberry Pi 4
 - [Raspberry Pi Build HAT](https://www.raspberrypi.com/products/build-hat/)
-- Raspberry Pi OS Bookworm (64bit)
+- **Raspberry Pi OS Bookworm (64bit)** — 下記の注意を参照
 - `sudo apt install python3-build-hat` (ファームウェアロード用)
 - `gcc`, `cmake >= 3.15`
+
+> **警告: OS バージョンについて (2026年5月時点)**
+>
+> 2026年5月現在、Raspberry Pi OS の最新版は **Trixie** ですが、
+> `python3-build-hat` パッケージおよび Build HAT ファームウェアは
+> **Bookworm でのみ動作確認されています**。
+> Trixie では `python3-build-hat` が提供されておらず、本ライブラリも動作しません。
+> Raspberry Pi 4 + Build HAT の組み合わせでは **Bookworm (Debian 12) を使用してください**。
 
 ## ビルド
 

@@ -1,19 +1,25 @@
 #!/usr/bin/env python3
-"""センサーテスト (Python版)"""
+"""センサーテスト
+ポート構成:
+  A(0): (未使用 or モーター)
+  B(1): フォースセンサー
+  C(2): カラーセンサー
+  D(3): 距離センサー
+"""
 import sys, time
 sys.path.insert(0, '../python')
-from spikehat import SpikeHat, DEVICE_DISTANCE, DEVICE_COLOR, DEVICE_FORCE
+from spikehat import SpikeHat, DEVICE_FORCE, DEVICE_COLOR, DEVICE_DISTANCE
 
 with SpikeHat() as hat:
-    hat.port_config(1, DEVICE_DISTANCE)
+    hat.port_config(1, DEVICE_FORCE)
     hat.port_config(2, DEVICE_COLOR)
-    hat.port_config(3, DEVICE_FORCE)
-    time.sleep(1)
+    hat.port_config(3, DEVICE_DISTANCE)
+    time.sleep(2)
 
     print("=== センサーテスト (10回) ===")
     for _ in range(10):
         try:
-            mm = hat.distance_read(1)
+            mm = hat.distance_read(3)
             print(f"距離: {mm:4d} mm", end="  ")
         except RuntimeError:
             print("距離: ----   ", end="  ")
@@ -25,7 +31,7 @@ with SpikeHat() as hat:
             print("色: --------  ", end="  ")
 
         try:
-            force, pressed = hat.force_read(3)
+            force, pressed = hat.force_read(1)
             print(f"力: {force:2d} N  {'[押下]' if pressed else '      '}")
         except RuntimeError:
             print("力: ----")

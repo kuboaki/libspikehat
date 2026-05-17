@@ -68,11 +68,21 @@ make -j4
 ## 初回起動の注意
 
 Build HAT のファームウェアは `python3-build-hat` が管理しています。
-本ライブラリを初めて使う前に一度だけ以下を実行してファームウェアをロードしてください。
+本ライブラリを初めて使う前に、以下の手順を実行してください。
+
+まず `python3-build-hat` をインストールします。
+
+```bash
+sudo apt install python3-build-hat
+```
+
+次に、以下を一度だけ実行してファームウェアを Build HAT にロードします。
 
 ```bash
 python3 -c "from buildhat import Motor"
 ```
+
+以降の起動時はこの手順は不要です。
 
 ## C 言語での使い方
 

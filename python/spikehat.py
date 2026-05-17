@@ -1,0 +1,143 @@
+"""
+spikehat - libspikehat の Python ctypes バインディング
+
+使い方:
+    from spikehat import SpikeHat, DEVICE_MOTOR_M, DEVICE_DISTANCE
+    with SpikeHat() as hat:
+        hat.port_config(0, DEVICE_MOTOR_M)
+        hat.motor_start(0, 50)
+"""
+import ctypes
+import os
+
+_here   = os.path.dirname(os.path.abspath(__file__))
+_so     = os.path.join(_here, '..', 'build', 'libspikehat.so')
+_lib    = ctypes.CDLL(os.path.realpath(_so))
+_hat_p  = ctypes.c_void_p
+_int_p  = ctypes.POINTER(ctypes.c_int)
+
+# --- 関数シグネチャ定義 ---
+_lib.spikehat_open.restype  = _hat_p
+_lib.spikehat_open.argtypes = [ctypes.c_char_p]
+
+_lib.spikehat_close.restype  = None
+_lib.spikehat_close.argtypes = [_hat_p]
+
+_lib.spikehat_port_config.restype  = ctypes.c_int
+_lib.spikehat_port_config.argtypes = [_hat_p, ctypes.c_int, ctypes.c_int]
+
+_lib.spikehat_motor_pwm.restype  = ctypes.c_int
+_lib.spikehat_motor_pwm.argtypes = [_hat_p, ctypes.c_int, ctypes.c_float]
+
+_lib.spikehat_motor_start.restype  = ctypes.c_int
+_lib.spikehat_motor_start.argtypes = [_hat_p, ctypes.c_int, ctypes.c_int]
+
+_lib.spikehat_motor_stop.restype  = ctypes.c_int
+_lib.spikehat_motor_stop.argtypes = [_hat_p, ctypes.c_int]
+
+_lib.spikehat_motor_coast.restype  = ctypes.c_int
+_lib.spikehat_motor_coast.argtypes = [_hat_p, ctypes.c_int]
+
+_lib.spikehat_motor_run_for_seconds.restype  = ctypes.c_int
+_lib.spikehat_motor_run_for_seconds.argtypes = [_hat_p, ctypes.c_int, ctypes.c_float, ctypes.c_int]
+
+_lib.spikehat_motor_get_speed.restype  = ctypes.c_int
+_lib.spikehat_motor_get_speed.argtypes = [_hat_p, ctypes.c_int, _int_p]
+
+_lib.spikehat_motor_get_position.restype  = ctypes.c_int
+_lib.spikehat_motor_get_position.argtypes = [_hat_p, ctypes.c_int, _int_p]
+
+_lib.spikehat_distance_read.restype  = ctypes.c_int
+_lib.spikehat_distance_read.argtypes = [_hat_p, ctypes.c_int, _int_p]
+
+_lib.spikehat_color_read_hsv.restype  = ctypes.c_int
+_lib.spikehat_color_read_hsv.argtypes = [_hat_p, ctypes.c_int, _int_p, _int_p, _int_p]
+
+_lib.spikehat_force_read.restype  = ctypes.c_int
+_lib.spikehat_force_read.argtypes = [_hat_p, ctypes.c_int, _int_p, _int_p]
+
+# デバイス種別定数 (spikehat.h の enum に対応)
+DEVICE_NONE     = 0
+DEVICE_MOTOR_M  = 1
+DEVICE_MOTOR_L  = 2
+DEVICE_COLOR    = 3
+DEVICE_DISTANCE = 4
+DEVICE_FORCE    = 5
+
+
+class SpikeHat:
+    """Build HAT 操作クラス (with文対応)"""
+
+    def __init__(self, device: str = "/dev/serial0"):
+        self._hat = _lib.spikehat_open(device.encode())
+        if not self._hat:
+            raise RuntimeError(f"Build HAT をオープンできません: {device}")
+
+    def close(self):
+        if self._hat:
+            _lib.spikehat_close(self._hat)
+            self._hat = None
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_):
+        self.close()
+
+    # ポート設定
+    def port_config(self, port: int, device_type: int) -> int:
+        return _lib.spikehat_port_config(self._hat, port, device_type)
+
+    # モーターAPI
+    def motor_pwm(self, port: int, power: float) -> int:
+        """直接PWM制御 (-1.0〜+1.0)"""
+        return _lib.spikehat_motor_pwm(self._hat, port, power)
+
+    def motor_start(self, port: int, speed: int) -> int:
+        """速度制御で回転開始 (-100〜+100)"""
+        return _lib.spikehat_motor_start(self._hat, port, speed)
+
+    def motor_stop(self, port: int) -> int:
+        return _lib.spikehat_motor_stop(self._hat, port)
+
+    def motor_coast(self, port: int) -> int:
+        return _lib.spikehat_motor_coast(self._hat, port)
+
+    def motor_run_for_seconds(self, port: int, seconds: float, speed: int) -> int:
+        return _lib.spikehat_motor_run_for_seconds(self._hat, port, seconds, speed)
+
+    def motor_get_speed(self, port: int) -> int:
+        v = ctypes.c_int()
+        if _lib.spikehat_motor_get_speed(self._hat, port, ctypes.byref(v)) != 0:
+            raise RuntimeError("速度データなし")
+        return v.value
+
+    def motor_get_position(self, port: int) -> int:
+        v = ctypes.c_int()
+        if _lib.spikehat_motor_get_position(self._hat, port, ctypes.byref(v)) != 0:
+            raise RuntimeError("位置データなし")
+        return v.value
+
+    # センサーAPI
+    def distance_read(self, port: int) -> int:
+        """距離をmm単位で返す"""
+        v = ctypes.c_int()
+        if _lib.spikehat_distance_read(self._hat, port, ctypes.byref(v)) != 0:
+            raise RuntimeError("距離データなし")
+        return v.value
+
+    def color_read_hsv(self, port: int) -> tuple:
+        """色をHSVタプルで返す (hue, sat, val)"""
+        h, s, v = ctypes.c_int(), ctypes.c_int(), ctypes.c_int()
+        if _lib.spikehat_color_read_hsv(self._hat, port,
+                                         ctypes.byref(h), ctypes.byref(s), ctypes.byref(v)) != 0:
+            raise RuntimeError("カラーデータなし")
+        return (h.value, s.value, v.value)
+
+    def force_read(self, port: int) -> tuple:
+        """力センサーの値を返す (force: int, pressed: bool)"""
+        f, p = ctypes.c_int(), ctypes.c_int()
+        if _lib.spikehat_force_read(self._hat, port,
+                                     ctypes.byref(f), ctypes.byref(p)) != 0:
+            raise RuntimeError("フォースデータなし")
+        return (f.value, bool(p.value))

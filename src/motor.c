@@ -11,15 +11,12 @@ int spikehat_motor_pwm(spikehat_t *hat, int port, float power) {
 int spikehat_motor_start(spikehat_t *hat, int port, int speed) {
     if (speed < -100) speed = -100;
     if (speed >  100) speed =  100;
-    /* speed は -100〜100 のまま PID セットポイントに渡す (Python buildhat と同仕様) */
-    return proto_sendf(hat->fd,
-        "port %d; select 0; selrate 10; "
-        "pid %d 0 0 s1 1 0 0.003 0.01 0 100 0.01; set %d",
-        port, port, speed);
+    /* buildhat と同様に PWM モードで制御 (speed/100 が duty cycle) */
+    return proto_sendf(hat->fd, "port %d; pwm; set %.2f", port, speed / 100.0);
 }
 
 int spikehat_motor_stop(spikehat_t *hat, int port) {
-    return proto_sendf(hat->fd, "port %d; off", port);
+    return proto_sendf(hat->fd, "port %d; coast", port);
 }
 
 int spikehat_motor_coast(spikehat_t *hat, int port) {
@@ -29,12 +26,8 @@ int spikehat_motor_coast(spikehat_t *hat, int port) {
 int spikehat_motor_run_for_seconds(spikehat_t *hat, int port, float seconds, int speed) {
     if (speed < -100) speed = -100;
     if (speed >  100) speed =  100;
-    /* speed は -100〜100 のまま使用 (Python buildhat と同仕様) */
-    return proto_sendf(hat->fd,
-        "port %d; select 0; selrate 10; "
-        "pid %d 0 0 s1 1 0 0.003 0.01 0 100 0.01; "
-        "set pulse %d 0 %f 0",
-        port, port, speed, (double)seconds);
+    return proto_sendf(hat->fd, "port %d; pwm; set pulse %.2f 0 %f 0",
+        port, speed / 100.0, (double)seconds);
 }
 
 int spikehat_motor_get_speed(spikehat_t *hat, int port, int *speed) {

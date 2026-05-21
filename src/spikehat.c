@@ -6,6 +6,28 @@
 #include <unistd.h>
 #include <stdio.h>
 
+/* --- 安全停止: グローバルHATレジストリ --- */
+#define SPIKEHAT_MAX_INSTANCES 4
+static spikehat_t          *g_hats[SPIKEHAT_MAX_INSTANCES];
+static pthread_mutex_t      g_hats_lock = PTHREAD_MUTEX_INITIALIZER;
+static volatile int g_stopping = 0;
+
+static void stop_all_motors(void) {
+    if (g_stopping) return;
+    g_stopping = 1;
+    for (int i = 0; i < SPIKEHAT_MAX_INSTANCES; i++) {
+        spikehat_t *hat = g_hats[i];
+        if (!hat) continue;
+        for (int p = 0; p < SPIKEHAT_MAX_PORTS; p++)
+            proto_sendf(hat->fd, "port %d; coast", p);
+    }
+    g_stopping = 0;
+}
+
+static void atexit_handler(void) {
+    stop_all_motors();
+}
+
 /* 受信スレッド: 全ポートのデータ行をキャッシュに書き込む */
 static void *reader_thread(void *arg) {
     spikehat_t *hat = (spikehat_t *)arg;
@@ -69,16 +91,38 @@ spikehat_t *spikehat_open(const char *device) {
     hat->running = 1;
     pthread_mutex_init(&hat->lock, NULL);
     pthread_create(&hat->reader, NULL, reader_thread, hat);
+
+    /* レジストリ登録 + 初回のみ atexit を設定 */
+    pthread_mutex_lock(&g_hats_lock);
+    static int handlers_registered = 0;
+    if (!handlers_registered) {
+        atexit(atexit_handler);
+        handlers_registered = 1;
+    }
+    for (int i = 0; i < SPIKEHAT_MAX_INSTANCES; i++) {
+        if (!g_hats[i]) { g_hats[i] = hat; break; }
+    }
+    pthread_mutex_unlock(&g_hats_lock);
+
     return hat;
 }
 
 void spikehat_close(spikehat_t *hat) {
     if (!hat) return;
-    /* 全使用ポートを停止 */
+
+    /* レジストリから除去（二重停止を防ぐ） */
+    pthread_mutex_lock(&g_hats_lock);
+    for (int i = 0; i < SPIKEHAT_MAX_INSTANCES; i++) {
+        if (g_hats[i] == hat) { g_hats[i] = NULL; break; }
+    }
+    pthread_mutex_unlock(&g_hats_lock);
+
+    /* 全使用ポートを停止し、HATが処理するまで待つ */
     for (int i = 0; i < SPIKEHAT_MAX_PORTS; i++) {
         if (hat->ports[i].device != SPIKEHAT_DEVICE_NONE)
-            proto_sendf(hat->fd, "port %d; coast; off", i);
+            proto_sendf(hat->fd, "port %d; coast", i);
     }
+    usleep(200000);  /* 200ms: HATがoffコマンドを処理する時間 */
     hat->running = 0;
     pthread_join(hat->reader, NULL);
     serial_close(hat->fd);

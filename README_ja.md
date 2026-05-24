@@ -2,8 +2,6 @@
 
 C/Python ライブラリ — Raspberry Pi Build HAT 経由で LEGO SPIKE Prime デバイスを透過的に操作する。
 
-![sonar_radar overview](docs/sonar_radar_overview.jpg)
-
 ## 概要
 
 `libspikehat` は Raspberry Pi Build HAT のシリアルプロトコルを直接実装した共有ライブラリです。

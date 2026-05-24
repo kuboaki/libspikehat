@@ -4,6 +4,8 @@ C/Python library — transparently control LEGO SPIKE Prime devices via Raspberr
 
 [日本語版 README](README_ja.md)
 
+![sonar_radar overview](docs/sonar_radar_overview.jpg)
+
 ## Overview
 
 `libspikehat` is a shared library that directly implements the Raspberry Pi Build HAT serial protocol.

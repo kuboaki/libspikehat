@@ -1,22 +1,24 @@
 # libspikehat
 
-C/Python ライブラリ — Raspberry Pi Build HAT 経由で LEGO SPIKE Prime デバイスを透過的に操作する。
+C/Python library — transparently control LEGO SPIKE Prime devices via Raspberry Pi Build HAT.
 
-## 概要
+[日本語版 README](README_ja.md)
 
-`libspikehat` は Raspberry Pi Build HAT のシリアルプロトコルを直接実装した共有ライブラリです。
-C アプリケーションからはリンクして、Python アプリケーションからは `ctypes` 経由で、
-**同じライブラリを通じて同じデバイスを操作**できます。
+## Overview
+
+`libspikehat` is a shared library that directly implements the Raspberry Pi Build HAT serial protocol.
+Both C and Python applications can control the same devices **through the same library** —
+C apps link against it directly, Python apps use it via `ctypes`.
 
 ```
 ┌───────────────┐       ┌─────────────────────┐
-│   C アプリ     │       │   Python アプリ       │
+│   C app        │       │   Python app         │
 └──────┬────────┘       └──────────┬───────────┘
        │                           │ ctypes
        └────────────┬──────────────┘
               ┌─────▼──────────────────────┐
               │   libspikehat.so            │
-              │  (Build HAT プロトコル実装)  │
+              │  (Build HAT protocol impl)  │
               └─────┬──────────────────────┘
                     │ UART /dev/serial0 (115200 baud)
               ┌─────▼──────────────────────┐
@@ -24,33 +26,32 @@ C アプリケーションからはリンクして、Python アプリケーシ�
               └────────────────────────────┘
 ```
 
-## 対応デバイス
+## Supported Devices
 
-| デバイス | 定数 | 機能 |
-|---------|------|------|
-| SPIKE Prime Mアンギュラーモーター | `SPIKEHAT_DEVICE_MOTOR_M` | PWM・速度制御・位置取得 |
-| SPIKE Prime Lアンギュラーモーター | `SPIKEHAT_DEVICE_MOTOR_L` | 同上 |
-| SPIKE Prime カラーセンサー | `SPIKEHAT_DEVICE_COLOR` | HSV 値取得 |
-| SPIKE Prime 距離センサー | `SPIKEHAT_DEVICE_DISTANCE` | 距離(mm)取得 |
-| SPIKE Prime フォースセンサー | `SPIKEHAT_DEVICE_FORCE` | 力(N)・押下状態取得 |
+| Device | Constant | Features |
+|--------|----------|----------|
+| SPIKE Prime M Angular Motor | `SPIKEHAT_DEVICE_MOTOR_M` | PWM, speed control, position readout |
+| SPIKE Prime L Angular Motor | `SPIKEHAT_DEVICE_MOTOR_L` | Same as above |
+| SPIKE Prime Color Sensor | `SPIKEHAT_DEVICE_COLOR` | HSV value readout |
+| SPIKE Prime Distance Sensor | `SPIKEHAT_DEVICE_DISTANCE` | Distance (mm) readout |
+| SPIKE Prime Force Sensor | `SPIKEHAT_DEVICE_FORCE` | Force (N) and pressed state readout |
 
-## 必要環境
+## Requirements
 
 - Raspberry Pi 4
 - [Raspberry Pi Build HAT](https://www.raspberrypi.com/products/build-hat/)
-- **Raspberry Pi OS Bookworm (64bit)** — 下記の注意を参照
-- `sudo apt install python3-build-hat` (ファームウェアロード用)
+- **Raspberry Pi OS Bookworm (64-bit)** — see warning below
+- `sudo apt install python3-build-hat` (for firmware loading)
 - `gcc`, `cmake >= 3.15`
 
-> **警告: OS バージョンについて (2026年5月時点)**
+> **Warning: OS version (as of May 2026)**
 >
-> 2026年5月現在、Raspberry Pi OS の最新版は **Trixie** ですが、
-> `python3-build-hat` パッケージおよび Build HAT ファームウェアは
-> **Bookworm でのみ動作確認されています**。
-> Trixie では `python3-build-hat` が提供されておらず、本ライブラリも動作しません。
-> Raspberry Pi 4 + Build HAT の組み合わせでは **Bookworm (Debian 12) を使用してください**。
+> As of May 2026, the latest Raspberry Pi OS is **Trixie**, but
+> `python3-build-hat` and the Build HAT firmware have only been verified on **Bookworm**.
+> `python3-build-hat` is not available on Trixie, and this library will not work there.
+> When using Raspberry Pi 4 + Build HAT, please use **Bookworm (Debian 12)**.
 
-## ビルド
+## Build
 
 ```bash
 git clone https://github.com/kuboaki/libspikehat.git
@@ -60,31 +61,31 @@ cmake .. -DCMAKE_BUILD_TYPE=Release
 make -j4
 ```
 
-生成物:
-- `build/libspikehat.so` — 共有ライブラリ
-- `build/test_motor` — C サンプル(モーター)
-- `build/test_sensor` — C サンプル(センサー)
+Build outputs:
+- `build/libspikehat.so` — shared library
+- `build/test_motor` — C sample (motor)
+- `build/test_sensor` — C sample (sensor)
 
-## 初回起動の注意
+## First-Time Setup
 
-Build HAT のファームウェアは `python3-build-hat` が管理しています。
-本ライブラリを初めて使う前に、以下の手順を実行してください。
+The Build HAT firmware is managed by `python3-build-hat`.
+Before using this library for the first time, follow these steps.
 
-まず `python3-build-hat` をインストールします。
+Install `python3-build-hat`:
 
 ```bash
 sudo apt install python3-build-hat
 ```
 
-次に、以下を一度だけ実行してファームウェアを Build HAT にロードします。
+Load the firmware onto the Build HAT (only needed once):
 
 ```bash
 python3 -c "from buildhat import Motor"
 ```
 
-以降の起動時はこの手順は不要です。
+This step is not required on subsequent runs.
 
-## C 言語での使い方
+## Usage in C
 
 ```c
 #include "spikehat.h"
@@ -92,32 +93,32 @@ python3 -c "from buildhat import Motor"
 int main(void) {
     spikehat_t *hat = spikehat_open("/dev/serial0");
 
-    // ポート設定 (A=0, B=1, C=2, D=3)
+    // Port configuration (A=0, B=1, C=2, D=3)
     spikehat_port_config(hat, 0, SPIKEHAT_DEVICE_MOTOR_M);
     spikehat_port_config(hat, 3, SPIKEHAT_DEVICE_DISTANCE);
     sleep(1);
 
-    // モーター: 速度50で3秒回転
+    // Motor: run at speed 50 for 3 seconds
     spikehat_motor_run_for_seconds(hat, 0, 3.0f, 50);
 
-    // 距離センサー読み取り
+    // Distance sensor readout
     int mm;
     if (spikehat_distance_read(hat, 3, &mm) == 0)
-        printf("距離: %d mm\n", mm);
+        printf("Distance: %d mm\n", mm);
 
     spikehat_close(hat);
     return 0;
 }
 ```
 
-コンパイル:
+Compile:
 ```bash
 gcc myapp.c -I/path/to/libspikehat/include \
     -L/path/to/libspikehat/build -lspikehat -lpthread \
     -Wl,-rpath,/path/to/libspikehat/build -o myapp
 ```
 
-## Python での使い方
+## Usage in Python
 
 ```python
 import sys
@@ -129,63 +130,63 @@ with SpikeHat() as hat:
     hat.port_config(3, DEVICE_DISTANCE)
 
     hat.motor_run_for_seconds(0, 3.0, 50)
-    print(f"距離: {hat.distance_read(3)} mm")
+    print(f"Distance: {hat.distance_read(3)} mm")
 ```
 
-## API リファレンス
+## API Reference
 
-### 初期化
+### Initialization
 
-| 関数 | 説明 |
-|------|------|
-| `spikehat_open(device)` | Build HAT をオープン。`device` は通常 `"/dev/serial0"` |
-| `spikehat_close(hat)` | 全デバイスを停止してクローズ |
-| `spikehat_port_config(hat, port, type)` | ポートにデバイス種別を割り当てて初期化 |
+| Function | Description |
+|----------|-------------|
+| `spikehat_open(device)` | Open the Build HAT. `device` is typically `"/dev/serial0"` |
+| `spikehat_close(hat)` | Stop all devices and close |
+| `spikehat_port_config(hat, port, type)` | Assign and initialize a device type on a port |
 
-### モーター制御
+### Motor Control
 
-| 関数 | 説明 |
-|------|------|
-| `spikehat_motor_pwm(hat, port, power)` | 直接 PWM 制御 (-1.0 〜 +1.0) |
-| `spikehat_motor_start(hat, port, speed)` | PID 速度制御で回転開始 (-100 〜 +100) |
-| `spikehat_motor_run_for_seconds(hat, port, sec, speed)` | 指定秒数回転 |
-| `spikehat_motor_stop(hat, port)` | 停止 (ブレーキ) |
-| `spikehat_motor_coast(hat, port)` | 惰性停止 |
-| `spikehat_motor_get_speed(hat, port, *speed)` | 現在速度を取得 |
-| `spikehat_motor_get_position(hat, port, *degrees)` | 現在位置(度)を取得 |
+| Function | Description |
+|----------|-------------|
+| `spikehat_motor_pwm(hat, port, power)` | Direct PWM control (-1.0 to +1.0) |
+| `spikehat_motor_start(hat, port, speed)` | Start rotating at given speed (-100 to +100) |
+| `spikehat_motor_run_for_seconds(hat, port, sec, speed)` | Run for specified seconds |
+| `spikehat_motor_stop(hat, port)` | Stop (coast) |
+| `spikehat_motor_coast(hat, port)` | Coast to stop |
+| `spikehat_motor_get_speed(hat, port, *speed)` | Get current speed |
+| `spikehat_motor_get_position(hat, port, *degrees)` | Get current position (degrees) |
 
-### センサー
+### Sensors
 
-| 関数 | 説明 |
-|------|------|
-| `spikehat_distance_read(hat, port, *mm)` | 距離をミリメートルで取得 |
-| `spikehat_color_read_hsv(hat, port, *h, *s, *v)` | 色を HSV で取得 |
-| `spikehat_force_read(hat, port, *force, *pressed)` | 力(N)と押下状態を取得 |
+| Function | Description |
+|----------|-------------|
+| `spikehat_distance_read(hat, port, *mm)` | Get distance in millimeters |
+| `spikehat_color_read_hsv(hat, port, *h, *s, *v)` | Get color as HSV |
+| `spikehat_force_read(hat, port, *force, *pressed)` | Get force (N) and pressed state |
 
-## プロジェクト構成
+## Project Structure
 
 ```
 libspikehat/
-├── include/spikehat.h      公開 API ヘッダ
+├── include/spikehat.h      Public API header
 ├── src/
-│   ├── serial.c/h          UART 通信
-│   ├── protocol.c/h        Build HAT テキストプロトコル
-│   ├── spikehat.c          初期化・受信スレッド・ポート管理
-│   ├── motor.c             モーター制御実装
-│   └── sensor.c            センサー読み取り実装
-├── python/spikehat.py      Python ctypes バインディング
+│   ├── serial.c/h          UART communication
+│   ├── protocol.c/h        Build HAT text protocol
+│   ├── spikehat.c          Initialization, reader thread, port management
+│   ├── motor.c             Motor control implementation
+│   └── sensor.c            Sensor readout implementation
+├── python/spikehat.py      Python ctypes bindings
 ├── examples/
-│   ├── test_motor.c/.py    モーターサンプル
-│   └── test_sensor.c/.py   センサーサンプル
+│   ├── test_motor.c/.py    Motor sample
+│   └── test_sensor.c/.py   Sensor sample
 └── CMakeLists.txt
 ```
 
-## プロトコル仕様
+## Protocol Notes
 
-Build HAT との通信は `/dev/serial0` (115200 baud, 8N1) のテキストプロトコルです。
-仕様の詳細は [raspberrypi/buildhat](https://github.com/raspberrypi/buildhat) リポジトリの
-`docs/protocol.md` を参照してください。
+Communication with the Build HAT uses a text protocol over `/dev/serial0` (115200 baud, 8N1).
+For protocol details, refer to `docs/protocol.md` in the
+[raspberrypi/buildhat](https://github.com/raspberrypi/buildhat) repository.
 
-## ライセンス
+## License
 
 MIT License

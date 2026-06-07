@@ -12,9 +12,9 @@ int main(void) {
 
     printf("=== モーターテスト ===\n");
 
-    /* 速度50で3秒間回転 */
-    printf("速度50で3秒間回転...\n");
-    spikehat_motor_run_for_seconds(hat, 0, 3.0f, 50);
+    /* 速度5で2秒間回転 */
+    printf("速度5で2秒間回転...\n");
+    spikehat_motor_run_for_seconds(hat, 0, 2.0f, 5);
     sleep(4);
 
     /* 現在の速度・位置を表示 */
@@ -24,9 +24,9 @@ int main(void) {
     if (spikehat_motor_get_position(hat, 0, &pos) == 0)
         printf("位置: %d 度\n", pos);
 
-    /* 逆方向に速度30で2秒間 */
-    printf("速度-30で2秒間回転...\n");
-    spikehat_motor_run_for_seconds(hat, 0, 2.0f, -30);
+    /* 逆方向に速度3で2秒間 */
+    printf("速度-3で2秒間回転...\n");
+    spikehat_motor_run_for_seconds(hat, 0, 2.0f, -3);
     sleep(3);
 
     spikehat_motor_coast(hat, 0);

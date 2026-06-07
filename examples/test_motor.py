@@ -10,8 +10,8 @@ with SpikeHat() as hat:
 
     print("=== モーターテスト ===")
 
-    print("速度50で3秒間回転...")
-    hat.motor_run_for_seconds(0, 3.0, 50)
+    print("速度5で2秒間回転...")
+    hat.motor_run_for_seconds(0, 2.0, 5)
     time.sleep(4)
 
     try:
@@ -20,8 +20,8 @@ with SpikeHat() as hat:
     except RuntimeError as e:
         print(f"フィードバックなし: {e}")
 
-    print("速度-30で2秒間回転...")
-    hat.motor_run_for_seconds(0, 2.0, -30)
+    print("速度-3で2秒間回転...")
+    hat.motor_run_for_seconds(0, 2.0, -3)
     time.sleep(3)
 
     hat.motor_coast(0)

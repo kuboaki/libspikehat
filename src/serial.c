@@ -28,6 +28,7 @@ int serial_open(const char *device) {
 }
 
 void serial_close(int fd) {
+    tcdrain(fd);  /* 送信バッファを全て送り出してからクローズ */
     close(fd);
 }
 

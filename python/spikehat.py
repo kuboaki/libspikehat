@@ -9,6 +9,8 @@ spikehat - libspikehat の Python ctypes バインディング
 """
 import ctypes
 import os
+import atexit
+import signal
 
 _here   = os.path.dirname(os.path.abspath(__file__))
 _so     = os.path.join(_here, '..', 'build', 'libspikehat.so')
@@ -72,6 +74,18 @@ class SpikeHat:
         self._hat = _lib.spikehat_open(device.encode())
         if not self._hat:
             raise RuntimeError(f"Build HAT をオープンできません: {device}")
+        atexit.register(self.close)
+        self._prev_sigint  = signal.signal(signal.SIGINT,  self._sig_handler)
+        self._prev_sigterm = signal.signal(signal.SIGTERM, self._sig_handler)
+
+    def _sig_handler(self, sig, frame):
+        self.close()
+        prev = self._prev_sigint if sig == signal.SIGINT else self._prev_sigterm
+        if callable(prev):
+            prev(sig, frame)
+        else:
+            signal.signal(sig, signal.SIG_DFL)
+            signal.raise_signal(sig)
 
     def close(self):
         if self._hat:

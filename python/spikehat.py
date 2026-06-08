@@ -43,6 +43,9 @@ _lib.spikehat_motor_coast.argtypes = [_hat_p, ctypes.c_int]
 _lib.spikehat_motor_run_for_seconds.restype  = ctypes.c_int
 _lib.spikehat_motor_run_for_seconds.argtypes = [_hat_p, ctypes.c_int, ctypes.c_float, ctypes.c_int]
 
+_lib.spikehat_motor_run_for_degrees.restype  = ctypes.c_int
+_lib.spikehat_motor_run_for_degrees.argtypes = [_hat_p, ctypes.c_int, ctypes.c_int, ctypes.c_int]
+
 _lib.spikehat_motor_get_speed.restype  = ctypes.c_int
 _lib.spikehat_motor_get_speed.argtypes = [_hat_p, ctypes.c_int, _int_p]
 
@@ -54,6 +57,9 @@ _lib.spikehat_distance_read.argtypes = [_hat_p, ctypes.c_int, _int_p]
 
 _lib.spikehat_color_read_hsv.restype  = ctypes.c_int
 _lib.spikehat_color_read_hsv.argtypes = [_hat_p, ctypes.c_int, _int_p, _int_p, _int_p]
+
+_lib.spikehat_color_read_rgb.restype  = ctypes.c_int
+_lib.spikehat_color_read_rgb.argtypes = [_hat_p, ctypes.c_int, _int_p, _int_p, _int_p]
 
 _lib.spikehat_force_read.restype  = ctypes.c_int
 _lib.spikehat_force_read.argtypes = [_hat_p, ctypes.c_int, _int_p, _int_p]
@@ -120,6 +126,9 @@ class SpikeHat:
     def motor_run_for_seconds(self, port: int, seconds: float, speed: int) -> int:
         return _lib.spikehat_motor_run_for_seconds(self._hat, port, seconds, speed)
 
+    def motor_run_for_degrees(self, port: int, degrees: int, speed: int) -> int:
+        return _lib.spikehat_motor_run_for_degrees(self._hat, port, degrees, speed)
+
     def motor_get_speed(self, port: int) -> int:
         v = ctypes.c_int()
         if _lib.spikehat_motor_get_speed(self._hat, port, ctypes.byref(v)) != 0:
@@ -147,6 +156,14 @@ class SpikeHat:
                                          ctypes.byref(h), ctypes.byref(s), ctypes.byref(v)) != 0:
             raise RuntimeError("カラーデータなし")
         return (h.value, s.value, v.value)
+
+    def color_read_rgb(self, port: int) -> tuple:
+        """色をRGBタプルで返す (r, g, b) 各0〜255"""
+        r, g, b = ctypes.c_int(), ctypes.c_int(), ctypes.c_int()
+        if _lib.spikehat_color_read_rgb(self._hat, port,
+                                         ctypes.byref(r), ctypes.byref(g), ctypes.byref(b)) != 0:
+            raise RuntimeError("カラーデータなし")
+        return (r.value, g.value, b.value)
 
     def force_read(self, port: int) -> tuple:
         """力センサーの値を返す (force: int, pressed: bool)"""

@@ -98,7 +98,9 @@ int main(void) {
     sleep(1);
 
     // モーター: 速度50で3秒回転
-    spikehat_motor_run_for_seconds(hat, 0, 3.0f, 50);
+    spikehat_motor_run_for_seconds(hat, 0, 2.0f, 5);
+    // reverse
+    spikehat_motor_run_for_seconds(hat, 0, 2.0f, -3);
 
     // 距離センサー読み取り
     int mm;
@@ -128,7 +130,9 @@ with SpikeHat() as hat:
     hat.port_config(0, DEVICE_MOTOR_M)
     hat.port_config(3, DEVICE_DISTANCE)
 
-    hat.motor_run_for_seconds(0, 3.0, 50)
+    hat.motor_run_for_seconds(0, 2.0, 5)
+    # reverse
+    hat.motor_run_for_seconds(0, 2.0, -3)
     print(f"距離: {hat.distance_read(3)} mm")
 ```
 

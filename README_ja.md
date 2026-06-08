@@ -97,7 +97,7 @@ int main(void) {
     spikehat_port_config(hat, 3, SPIKEHAT_DEVICE_DISTANCE);
     sleep(1);
 
-    // モーター: 速度50で3秒回転
+    // モーター: 速度5で2秒回転、逆方向に速度-3で2秒
     spikehat_motor_run_for_seconds(hat, 0, 2.0f, 5);
     // reverse
     spikehat_motor_run_for_seconds(hat, 0, 2.0f, -3);

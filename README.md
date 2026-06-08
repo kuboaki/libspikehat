@@ -98,7 +98,7 @@ int main(void) {
     spikehat_port_config(hat, 3, SPIKEHAT_DEVICE_DISTANCE);
     sleep(1);
 
-    // Motor: run at speed 50 for 3 seconds
+    // Motor: run at speed 5 for 2 seconds, then reverse at speed -3
     spikehat_motor_run_for_seconds(hat, 0, 2.0f, 5);
     // reverse
     spikehat_motor_run_for_seconds(hat, 0, 2.0f, -3);

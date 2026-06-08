@@ -17,19 +17,26 @@ with SpikeHat() as hat:
     time.sleep(2)
 
     print("=== センサーテスト (10回) ===")
-    for _ in range(10):
+    for i in range(10):
+        # 距離センサー
         try:
             mm = hat.distance_read(3)
             print(f"距離: {mm:4d} mm", end="  ")
         except RuntimeError:
             print("距離: ----   ", end="  ")
 
+        # カラーセンサー: HSV と RGB を交互に表示
         try:
-            h, s, v = hat.color_read_hsv(2)
-            print(f"色(HSV): {h:3d}/{s:3d}/{v:3d}", end="  ")
+            if i % 2 == 0:
+                h, s, v = hat.color_read_hsv(2)
+                print(f"HSV: {h:3d}/{s:3d}/{v:3d}", end="  ")
+            else:
+                r, g, b = hat.color_read_rgb(2)
+                print(f"RGB: {r:3d}/{g:3d}/{b:3d}", end="  ")
         except RuntimeError:
             print("色: --------  ", end="  ")
 
+        # フォースセンサー
         try:
             force, pressed = hat.force_read(1)
             print(f"力: {force:2d} N  {'[押下]' if pressed else '      '}")

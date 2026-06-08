@@ -30,7 +30,8 @@ static int color_switch_mode(spikehat_t *hat, int port, int new_mode) {
     hat->ports[port].select_mode = new_mode;
     pthread_mutex_unlock(&hat->lock);
 
-    proto_sendf(hat->fd, "port %d; select; select %d; selrate 10", port, new_mode);
+    /* set -1 でランプ電源を維持してからモード切り替え */
+    proto_sendf(hat->fd, "port %d; port_plimit 1; set -1; select; select %d; selrate 10", port, new_mode);
 
     /* 新しいデータが届くまで待つ (最大1秒) */
     for (int i = 0; i < 20; i++) {

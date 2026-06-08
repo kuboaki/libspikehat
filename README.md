@@ -131,6 +131,7 @@ with SpikeHat() as hat:
     hat.port_config(0, DEVICE_MOTOR_M)
     hat.port_config(3, DEVICE_DISTANCE)
 
+    # Motor: run at speed 5 for 2 seconds, then reverse at speed -3
     hat.motor_run_for_seconds(0, 2.0, 5)
     # reverse
     hat.motor_run_for_seconds(0, 2.0, -3)

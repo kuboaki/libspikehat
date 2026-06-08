@@ -130,6 +130,7 @@ with SpikeHat() as hat:
     hat.port_config(0, DEVICE_MOTOR_M)
     hat.port_config(3, DEVICE_DISTANCE)
 
+    # モーター: 速度5で2秒回転、逆方向に速度-3で2秒
     hat.motor_run_for_seconds(0, 2.0, 5)
     # reverse
     hat.motor_run_for_seconds(0, 2.0, -3)

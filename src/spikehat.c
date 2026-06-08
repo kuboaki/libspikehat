@@ -150,7 +150,8 @@ int spikehat_port_config(spikehat_t *hat, int port, spikehat_device_t type) {
             "port %d; port_plimit 1; set -1; select 0; selrate 10", port);
         break;
     case SPIKEHAT_DEVICE_COLOR:
-        /* シンプルモード6: HSV -> P<N>M6: <hue> <sat> <val> */
+        /* シンプルモード6: HSV -> P<N>M6: <hue> <sat> <val> (初期値) */
+        hat->ports[port].select_mode = 6;
         proto_sendf(hat->fd,
             "port %d; port_plimit 1; set -1; select 6; selrate 10", port);
         break;

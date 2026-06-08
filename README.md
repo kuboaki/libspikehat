@@ -150,6 +150,7 @@ with SpikeHat() as hat:
 | `spikehat_motor_pwm(hat, port, power)` | Direct PWM control (-1.0 to +1.0) |
 | `spikehat_motor_start(hat, port, speed)` | Start rotating at given speed (-100 to +100) |
 | `spikehat_motor_run_for_seconds(hat, port, sec, speed)` | Run for specified seconds |
+| `spikehat_motor_run_for_degrees(hat, port, deg, speed)` | Run for specified degrees (negative speed = reverse) |
 | `spikehat_motor_stop(hat, port)` | Stop (coast) |
 | `spikehat_motor_coast(hat, port)` | Coast to stop |
 | `spikehat_motor_get_speed(hat, port, *speed)` | Get current speed |
@@ -161,6 +162,7 @@ with SpikeHat() as hat:
 |----------|-------------|
 | `spikehat_distance_read(hat, port, *mm)` | Get distance in millimeters |
 | `spikehat_color_read_hsv(hat, port, *h, *s, *v)` | Get color as HSV |
+| `spikehat_color_read_rgb(hat, port, *r, *g, *b)` | Get color as RGB (0–255 each) |
 | `spikehat_force_read(hat, port, *force, *pressed)` | Get force (N) and pressed state |
 
 ## Project Structure

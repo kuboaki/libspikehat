@@ -149,6 +149,7 @@ with SpikeHat() as hat:
 | `spikehat_motor_pwm(hat, port, power)` | 直接 PWM 制御 (-1.0 〜 +1.0) |
 | `spikehat_motor_start(hat, port, speed)` | PID 速度制御で回転開始 (-100 〜 +100) |
 | `spikehat_motor_run_for_seconds(hat, port, sec, speed)` | 指定秒数回転 |
+| `spikehat_motor_run_for_degrees(hat, port, deg, speed)` | 指定角度回転（speed 負値で逆転） |
 | `spikehat_motor_stop(hat, port)` | 停止 (ブレーキ) |
 | `spikehat_motor_coast(hat, port)` | 惰性停止 |
 | `spikehat_motor_get_speed(hat, port, *speed)` | 現在速度を取得 |
@@ -160,6 +161,7 @@ with SpikeHat() as hat:
 |------|------|
 | `spikehat_distance_read(hat, port, *mm)` | 距離をミリメートルで取得 |
 | `spikehat_color_read_hsv(hat, port, *h, *s, *v)` | 色を HSV で取得 |
+| `spikehat_color_read_rgb(hat, port, *r, *g, *b)` | 色を RGB で取得（各 0〜255） |
 | `spikehat_force_read(hat, port, *force, *pressed)` | 力(N)と押下状態を取得 |
 
 ## プロジェクト構成

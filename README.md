@@ -169,6 +169,16 @@ with SpikeHat() as hat:
 | `spikehat_color_read_hsv(hat, port, *h, *s, *v)` | Get color as HSV |
 | `spikehat_color_read_rgb(hat, port, *r, *g, *b)` | Get color as RGB (0–255 each) |
 | `spikehat_force_read(hat, port, *force, *pressed)` | Get force (N) and pressed state |
+| `spikehat_force_is_pressed(hat, port, *pressed)` | Get pressed state only |
+| `spikehat_force_get_force(hat, port, *force)` | Get force (N) only |
+
+## Force Sensor Notes
+
+The SPIKE Prime Force Sensor raw value range is **0〜100** (not 0〜1024).
+The conversion to Newtons is: `force_N = raw_value / 10.0`
+
+- `force`: 0〜10 N
+- `pressed`: 1 when touched (may be 1 even when force=0)
 
 ## Project Structure
 

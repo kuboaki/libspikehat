@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <math.h>
+#include <stdio.h>
 
 static int get_cached(spikehat_t *hat, int port, float *values, int *nvalues) {
     if (!hat || port < 0 || port >= SPIKEHAT_MAX_PORTS) return -1;
@@ -76,8 +77,7 @@ int spikehat_color_read_rgb(spikehat_t *hat, int port, int *r, int *g, int *b) {
 int spikehat_force_read(spikehat_t *hat, int port, int *force, int *pressed) {
     float v[8]; int n;
     if (get_cached(hat, port, v, &n) != 0 || n < 2) return -1;
-    /* v[0]: 生値 0〜1024 → 0〜10 N に変換 */
-    *force   = (int)roundf(v[0] / 1024.0f * 10.0f);
+    *force   = (int)roundf(v[0] / 10.0f);
     *pressed = (int)v[1];
     return 0;
 }

@@ -165,3 +165,8 @@ int spikehat_port_config(spikehat_t *hat, int port, spikehat_device_t type) {
     }
     return 0;
 }
+
+void spikehat_sleep(spikehat_t *hat, float seconds) {
+    (void)hat;  /* 実機版では hat は使わない */
+    usleep((useconds_t)(seconds * 1e6f));
+}

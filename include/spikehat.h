@@ -39,6 +39,13 @@ typedef struct spikehat {
 spikehat_t *spikehat_open(const char *device);
 void        spikehat_close(spikehat_t *hat);
 
+/* スリープ
+ * 実機版: OS の usleep() と同等
+ * シム版: MuJoCo のシミュレーションステップを進める
+ * 注意: time.sleep() や usleep() を直接使うとシム版では
+ *       センサー値が更新されないため、必ずこの関数を使うこと */
+void spikehat_sleep(spikehat_t *hat, float seconds);
+
 /* ポート設定 */
 int spikehat_port_config(spikehat_t *hat, int port, spikehat_device_t type);
 
@@ -57,6 +64,8 @@ int spikehat_distance_read(spikehat_t *hat, int port, int *mm);
 int spikehat_color_read_hsv(spikehat_t *hat, int port, int *hue, int *sat, int *val);
 int spikehat_color_read_rgb(spikehat_t *hat, int port, int *r, int *g, int *b);
 int spikehat_force_read(spikehat_t *hat, int port, int *force, int *pressed);
+int spikehat_force_is_pressed(spikehat_t *hat, int port, int *pressed);
+int spikehat_force_get_force(spikehat_t *hat, int port, int *force);
 
 #ifdef __cplusplus
 }

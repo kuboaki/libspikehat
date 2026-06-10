@@ -22,7 +22,8 @@ set_target_properties(spikehat PROPERTIES
 
 add_executable(test_motor   examples/test_motor.c)
 add_executable(test_sensor  examples/test_sensor.c)
-foreach(t test_motor test_sensor)
+add_executable(test_force_sensor examples/test_force_sensor.c)
+foreach(t test_motor test_sensor test_force_sensor)
     target_include_directories(${t} PRIVATE include)
     target_link_libraries(${t} spikehat)
 endforeach()

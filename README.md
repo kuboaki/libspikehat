@@ -161,6 +161,12 @@ with SpikeHat() as hat:
 | `spikehat_motor_get_speed(hat, port, *speed)` | Get current speed |
 | `spikehat_motor_get_position(hat, port, *degrees)` | Get current position (degrees) |
 
+**Note:** The `seconds` parameter of `spikehat_motor_run_for_seconds` specifies the
+duration of the constant-speed phase only. Including the built-in
+acceleration/deceleration ramp, the motor may keep moving for a few seconds
+(roughly 2-5 seconds longer, depending on speed) after the specified time
+before it fully settles.
+
 ### Sensors
 
 | Function | Description |

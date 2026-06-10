@@ -160,6 +160,10 @@ with SpikeHat() as hat:
 | `spikehat_motor_get_speed(hat, port, *speed)` | 現在速度を取得 |
 | `spikehat_motor_get_position(hat, port, *degrees)` | 現在位置(度)を取得 |
 
+**注意:** `spikehat_motor_run_for_seconds`の`seconds`は、加減速を含まない定速区間の
+長さです。内部の加減速ランプを含めると、指定秒数を過ぎてから実際にモーターが
+完全に停止するまで、速度に応じてさらに2〜5秒程度かかることがあります。
+
 ### センサー
 
 | 関数 | 説明 |

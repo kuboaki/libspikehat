@@ -6,11 +6,11 @@ test_force_sensor.py — フォースセンサーテスト（Python版）
   B(1): フォースセンサー
 
 実機での実行方法:
-  python3 examples/test_force_sensor.py
+  cd examples && python3 test_force_sensor.py
 
 シムでの実行方法:
-  SPIKEHAT_SIM_XML=examples/test_force_sensor.xml \\
-    python3 examples/test_force_sensor.py
+  cd examples && SPIKEHAT_SIM_XML=test_force_sensor.xml \\
+    python3 test_force_sensor.py
 
 テスト内容:
   1. force_read       : force[N] と pressed を同時に取得
@@ -19,7 +19,7 @@ test_force_sensor.py — フォースセンサーテスト（Python版）
 """
 import sys
 import time
-sys.path.insert(0, 'python')
+sys.path.insert(0, '../python')
 
 from spikehat import SpikeHat, DEVICE_FORCE
 

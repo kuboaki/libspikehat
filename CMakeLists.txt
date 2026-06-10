@@ -14,7 +14,7 @@ target_include_directories(spikehat
     PUBLIC  include
     PRIVATE src
 )
-target_link_libraries(spikehat pthread)
+target_link_libraries(spikehat pthread m)
 set_target_properties(spikehat PROPERTIES
     VERSION   1.0.0
     SOVERSION 1

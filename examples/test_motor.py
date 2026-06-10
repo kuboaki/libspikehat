@@ -76,9 +76,9 @@ with SpikeHat() as hat:
     print("\n=== モーターテスト (motor_pwm -> motor_stop) ===")
     return_to_origin(hat, PORT_MOTOR)
 
-    print(f"pwm 0.1で回転, 5秒後にstop...")
+    print(f"pwm 0.1で回転, 2秒後にstop...")
     hat.motor_pwm(PORT_MOTOR, 0.1)
-    hat.sleep(5.0)
+    hat.sleep(2.0)
     hat.motor_stop(PORT_MOTOR)
     print_status(hat, PORT_MOTOR)
 

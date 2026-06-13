@@ -46,6 +46,9 @@ _lib.spikehat_motor_run_for_seconds.argtypes = [_hat_p, ctypes.c_int, ctypes.c_f
 _lib.spikehat_motor_run_for_degrees.restype  = ctypes.c_int
 _lib.spikehat_motor_run_for_degrees.argtypes = [_hat_p, ctypes.c_int, ctypes.c_int, ctypes.c_int]
 
+_lib.spikehat_motor_run_to_position.restype  = ctypes.c_int
+_lib.spikehat_motor_run_to_position.argtypes = [_hat_p, ctypes.c_int, ctypes.c_int, ctypes.c_int]
+
 _lib.spikehat_motor_get_speed.restype  = ctypes.c_int
 _lib.spikehat_motor_get_speed.argtypes = [_hat_p, ctypes.c_int, _int_p]
 
@@ -137,6 +140,9 @@ class SpikeHat:
 
     def motor_run_for_degrees(self, port: int, degrees: int, speed: int) -> int:
         return _lib.spikehat_motor_run_for_degrees(self._hat, port, degrees, speed)
+
+    def motor_run_to_position(self, port: int, position_deg: int, speed: int) -> int:
+        return _lib.spikehat_motor_run_to_position(self._hat, port, position_deg, speed)
 
     def motor_get_speed(self, port: int) -> int:
         v = ctypes.c_int()

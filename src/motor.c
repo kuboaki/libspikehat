@@ -35,14 +35,11 @@ int spikehat_motor_run_for_seconds(spikehat_t *hat, int port, float seconds, int
         port, port, speed, (double)seconds);
 }
 
-int spikehat_motor_run_for_degrees(spikehat_t *hat, int port, int degrees, int speed) {
+int spikehat_motor_run_to_position(spikehat_t *hat, int port, int position_deg, int speed) {
     if (speed == 0)   return -1;
     if (speed < -100) speed = -100;
     if (speed >  100) speed =  100;
-
-    /* 負のspeedは方向反転として扱う (Python buildhat と同仕様) */
-    int mul = 1;
-    if (speed < 0) { speed = -speed; mul = -1; }
+    if (speed < 0) speed = -speed;
 
     /* 現在位置を取得 */
     int cur_pos = 0;
@@ -51,7 +48,7 @@ int spikehat_motor_run_for_degrees(spikehat_t *hat, int port, int degrees, int s
     /* Python buildhat と同仕様: speed×0.05 で 0〜5 の速度単位に変換 */
     double sv     = speed * 0.05;
     double pos    = cur_pos / 360.0;        /* 現在位置 (回転数) */
-    double newpos = (cur_pos + degrees * mul) / 360.0; /* 目標位置 (回転数) */
+    double newpos = position_deg / 360.0;   /* 目標位置 (回転数) */
     double diff   = newpos - pos;
     double dur    = (diff < 0 ? -diff : diff) / sv;
     /* 最低でも0.5秒を確保 (モーターが物理的に追いつけるよう余裕を持たせる) */
@@ -62,6 +59,19 @@ int spikehat_motor_run_for_degrees(spikehat_t *hat, int port, int degrees, int s
         "pid %d 0 1 s4 0.0027777778 0 5 0 .1 3 0.01; "
         "set ramp %f %f %f 0",
         port, port, pos, newpos, dur);
+}
+
+int spikehat_motor_run_for_degrees(spikehat_t *hat, int port, int degrees, int speed) {
+    if (speed == 0) return -1;
+
+    /* 負のspeedは方向反転として扱う (Python buildhat と同仕様) */
+    int mul = (speed < 0) ? -1 : 1;
+
+    /* 現在位置を取得 */
+    int cur_pos = 0;
+    spikehat_motor_get_position(hat, port, &cur_pos);
+
+    return spikehat_motor_run_to_position(hat, port, cur_pos + degrees * mul, speed);
 }
 
 int spikehat_motor_get_speed(spikehat_t *hat, int port, int *speed) {

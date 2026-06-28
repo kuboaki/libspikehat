@@ -85,6 +85,25 @@ python3 -c "from buildhat import Motor"
 
 This step is not required on subsequent runs.
 
+### After rebooting the Raspberry Pi
+
+The Build HAT is powered via its own USB-C connector, independently of the
+Raspberry Pi. When you run `sudo reboot`, the Raspberry Pi restarts but the
+Build HAT stays powered and retains its previous port state (selected modes,
+data streaming, etc.).
+
+`spikehat_open` handles this automatically by deselecting all ports at
+startup to clear any leftover state.
+
+However, if the Build HAT firmware was not yet loaded before the reboot,
+you must reload it manually:
+
+```bash
+python3 -c "from buildhat import Motor"
+```
+
+To fully reset the Build HAT, unplug and replug its USB-C power cable.
+
 ## Usage in C
 
 ```c

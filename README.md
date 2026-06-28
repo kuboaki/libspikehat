@@ -87,10 +87,10 @@ This step is not required on subsequent runs.
 
 ### After rebooting the Raspberry Pi
 
-The Build HAT is powered via its own USB-C connector, independently of the
-Raspberry Pi. When you run `sudo reboot`, the Raspberry Pi restarts but the
-Build HAT stays powered and retains its previous port state (selected modes,
-data streaming, etc.).
+The Build HAT is powered via a DC barrel jack (8V), which also supplies
+power to the Raspberry Pi. When you run `sudo reboot`, the Raspberry Pi
+restarts but the Build HAT stays powered and retains its previous port
+state (selected modes, data streaming, etc.).
 
 `spikehat_open` handles this automatically by deselecting all ports at
 startup to clear any leftover state.
@@ -102,7 +102,7 @@ you must reload it manually:
 python3 -c "from buildhat import Motor"
 ```
 
-To fully reset the Build HAT, unplug and replug its USB-C power cable.
+To fully reset the Build HAT, unplug and replug the DC barrel jack.
 
 ## Usage in C
 

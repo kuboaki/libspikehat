@@ -86,10 +86,10 @@ python3 -c "from buildhat import Motor"
 
 ### Raspberry Pi 再起動後の注意
 
-Build HAT は Raspberry Pi とは独立した USB-C 電源で動作しています。
-`sudo reboot` で RPi を再起動しても Build HAT への給電は継続されるため、
-Build HAT は前回のポート状態（選択中のモード、データストリーミング等）を
-保持したままになります。
+Build HAT は DC バレルジャック（8V）で給電されており、この電源は
+Raspberry Pi にも供給されています。`sudo reboot` で RPi を再起動しても
+Build HAT への給電は継続されるため、Build HAT は前回のポート状態
+（選択中のモード、データストリーミング等）を保持したままになります。
 
 `spikehat_open` は起動時に全ポートをデセレクトすることで、この残留状態を
 自動的にクリアします。
@@ -101,7 +101,7 @@ Build HAT は前回のポート状態（選択中のモード、データスト�
 python3 -c "from buildhat import Motor"
 ```
 
-Build HAT を完全にリセットするには、USB-C ケーブルを一度抜き差ししてください。
+Build HAT を完全にリセットするには、DC バレルジャックを一度抜き差ししてください。
 
 ## C 言語での使い方
 

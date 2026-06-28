@@ -3,6 +3,7 @@
 #include "protocol.h"
 #include <stdlib.h>
 #include <string.h>
+#include <termios.h>
 #include <unistd.h>
 #include <stdio.h>
 
@@ -59,12 +60,19 @@ spikehat_t *spikehat_open(const char *device) {
         return NULL;
     }
 
+    /* 前のセッションで選択中のポートがデータをストリーミングしている
+     * 可能性があるため、全ポートをデセレクトしてバッファを空にする */
+    write(fd, "port 0; select; port 1; select; "
+              "port 2; select; port 3; select;\r", 64);
+    usleep(300000);
+    tcflush(fd, TCIFLUSH);
+
     /* ファームウェア確認 */
     write(fd, "version\r", 8);
-    usleep(300000);
+    usleep(200000);
     char line[512];
     int found = 0;
-    for (int i = 0; i < 15 && !found; i++) {
+    for (int i = 0; i < 20 && !found; i++) {
         serial_readline(fd, line, sizeof(line), 400);
         if (strncmp(line, "Firmware version:", 17) == 0) found = 1;
     }

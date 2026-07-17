@@ -210,6 +210,10 @@ libspikehat/
 └── CMakeLists.txt
 ```
 
+## 関連ドキュメント
+
+- [Raspberry Pi 4 + Build HAT のヒートシンクファン冷却](docs/cooling_buildhat_raspi4.md)
+
 ## プロトコル仕様
 
 Build HAT との通信は `/dev/serial0` (115200 baud, 8N1) のテキストプロトコルです。

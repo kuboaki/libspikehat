@@ -11,6 +11,7 @@ import ctypes
 import os
 import atexit
 import signal
+import warnings
 
 _here   = os.path.dirname(os.path.abspath(__file__))
 _so     = os.path.join(_here, '..', 'build', 'libspikehat.so')
@@ -142,6 +143,16 @@ class SpikeHat:
         return _lib.spikehat_motor_run_for_degrees(self._hat, port, degrees, speed)
 
     def motor_run_to_position(self, port: int, position_deg: int, speed: int) -> int:
+        warnings.warn(
+            "motor_run_to_position()は非同期・fire-and-forgetの一発コマンドで、"
+            "BuildHATファームウェア側の独自基準で目標手前で停止することがあり、"
+            "呼び出し側が使う許容誤差より大きくずれたまま戻ってこなくなりうる"
+            "(sonar_radar-zenoh-bridge 2026-08-03の実機不具合を参照)。"
+            "毎tick motor_get_position()を見てmotor_pwm()で補正し続ける"
+            "閉ループ制御(sonar_radar.pyの_drive_to()参照)を推奨。",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return _lib.spikehat_motor_run_to_position(self._hat, port, position_deg, speed)
 
     def motor_get_speed(self, port: int) -> int:
